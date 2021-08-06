@@ -9,7 +9,7 @@ use steven_protocol::protocol::packet;
 use steven_protocol::protocol::{VarInt, VarLong};
 use steven_shared::Position;
 
-define_protocol!(pub Proto_1_17_1, "1.17", 755, {
+crate::define_protocol!(pub Proto_1_17_1, "1.17", 755, {
     State::Handshaking => {
         Direction::ServerBound => {
             /// Handshake is the first packet sent in the protocol.

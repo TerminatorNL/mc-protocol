@@ -1,8 +1,5 @@
 /// Implements Stevenarella to be used in this project.
 /// https://github.com/iceiix/stevenarella
-#[cfg(feature = "steven_shared")]
-pub mod version;
-
 mod private {
     fn convert_error(steven_error: steven_protocol::protocol::Error) -> std::io::Error{
         std::io::Error::new(std::io::ErrorKind::Other, steven_error)

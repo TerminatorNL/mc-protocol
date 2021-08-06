@@ -1,5 +1,7 @@
 use crate::segment::Segment;
 
+pub mod implementation;
+
 #[derive(Debug, Clone)]
 pub enum State{
     Handshaking,
@@ -40,7 +42,7 @@ pub trait Packet: Segment + Sized{
     }
 }
 
-#[allow(unused)]
+#[macro_export]
 macro_rules! define_protocol {
     ($struct_vis:vis $struct_name:ident, $protocol_name:literal, $protocol_version:literal, {$($state:path =>{$($direction:path =>{$($(#[$struct_doc:meta])* $id:literal => $packet:ident$({$( $(#[$field_doc:meta])* $field:ident: $value_type:ty $(where |$acceptor:ident|$condition:block)?),*$(,)?})?),+$(,)?}),+$(,)?}),+$(,)?}) => {
 

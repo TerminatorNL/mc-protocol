@@ -1,4 +1,5 @@
 use crate::segment::Segment;
+use std::fmt::Debug;
 
 pub mod implementation;
 
@@ -16,7 +17,7 @@ pub enum Direction{
     ServerBound
 }
 
-pub trait Protocol: Sized{
+pub trait Protocol: Sized + Debug{
     const NAME: &'static str;
     const PROTOCOL: i32;
 
@@ -34,7 +35,7 @@ pub trait Protocol: Sized{
     fn packet_by_id<R: std::io::Read>(state: State, direction: Direction, id: i32, reader: &mut R) -> Option<std::io::Result<Self>>;
 }
 
-pub trait Packet: Segment + Sized{
+pub trait Packet: Segment + Sized + Debug{
     const PACKET_ID: i32;
     #[inline]
     fn packet_id(&self) -> i32 {
@@ -82,6 +83,7 @@ macro_rules! define_protocol {
         })+)+)+
 
         #[allow(unused, non_camel_case_types)]
+        #[derive(Debug)]
         $struct_vis enum $struct_name {
             $($($($packet(Box<$packet>)),+),+),+
         }

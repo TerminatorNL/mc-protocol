@@ -32,7 +32,7 @@ pub trait Protocol: Sized + Debug{
     }
 
     #[allow(unused)]
-    fn packet_by_id<R: std::io::Read>(state: State, direction: Direction, id: i32, reader: &mut R) -> Option<std::io::Result<Self>>;
+    fn packet_by_id<R: std::io::Read>(state: State, direction: Direction, id: i32, reader: &mut R) -> std::io::Result<Option<Self>>;
 }
 
 pub trait Packet: Segment + Sized + Debug{
@@ -45,12 +45,13 @@ pub trait Packet: Segment + Sized + Debug{
 
 #[macro_export]
 macro_rules! define_protocol {
-    ($struct_vis:vis $struct_name:ident, $protocol_name:literal, $protocol_version:literal, {$($state:path =>{$($direction:path =>{$($(#[$struct_doc:meta])* $id:literal => $packet:ident$({$( $(#[$field_doc:meta])* $field:ident: $value_type:ty $(where |$acceptor:ident|$condition:block)?),*$(,)?})?),+$(,)?}),+$(,)?}),+$(,)?}) => {
+    ($(#[$enum_meta:meta])* $struct_vis:vis $struct_name:ident, $protocol_name:literal, $protocol_version:literal $(, #[$global_packet_meta:meta])*{$($state:path =>{$($direction:path =>{$($(#[$packet_meta:meta])* $id:literal => $packet:ident$({$( $(#[$field_doc:meta])* $field:ident: $value_type:ty $(where |$acceptor:ident|$condition:block)?),*$(,)?})?),+$(,)?}),+$(,)?}),+$(,)?}) => {
 
+        $(#[$global_packet_meta])*
         $($($(
         #[allow(unused)]
-        #[derive(Debug, Default)]
-        $(#[$struct_doc])*
+        #[derive(Default, Debug)]
+        $(#[$packet_meta])*
         $struct_vis struct $packet {
             $($(
                 $(#[$field_doc])*
@@ -84,6 +85,7 @@ macro_rules! define_protocol {
 
         #[allow(unused, non_camel_case_types)]
         #[derive(Debug)]
+        $(#[$enum_meta])*
         $struct_vis enum $struct_name {
             $($($($packet(Box<$packet>)),+),+),+
         }
@@ -93,7 +95,7 @@ macro_rules! define_protocol {
             const PROTOCOL: i32 = $protocol_version;
 
             #[allow(unreachable_patterns)]
-            fn packet_by_id<R: std::io::Read>(state: State, direction: crate::protocol::Direction, id: i32, reader: &mut R) -> Option<std::io::Result<Self>> {
+            fn packet_by_id<R: std::io::Read>(state: State, direction: crate::protocol::Direction, id: i32, reader: &mut R) -> std::io::Result<Option<Self>> {
                 match state {
                     $($state => {
                         match direction {
@@ -102,18 +104,18 @@ macro_rules! define_protocol {
                                     $($id => {
                                         let mut p: Box<$packet> = Box::new(Default::default());
                                         if let Err(e) = crate::segment::Segment::read_from_stream(&mut p, reader){
-                                            Some(Err(e))
+                                            Err(e)
                                         }else{
-                                            Some(Ok(Self::$packet(p)))
+                                            Ok(Some(Self::$packet(p)))
                                         }
                                     }),+,
-                                    _ => None
+                                    _ => Ok(None)
                                 }
                             }),+,
-                            _ => None
+                            _ => Ok(None)
                         }
                     }),+,
-                    _ => None
+                    _ => Ok(None)
                 }
             }
         }

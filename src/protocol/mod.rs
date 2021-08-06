@@ -15,8 +15,20 @@ pub enum Direction{
 }
 
 pub trait Protocol: Sized{
-    fn name() -> &'static str;
-    fn protocol() -> i32;
+    const NAME: &'static str;
+    const PROTOCOL: i32;
+
+    #[allow(unused)]
+    fn name() -> &'static str {
+        Self::NAME
+    }
+
+    #[allow(unused)]
+    fn protocol() -> i32 {
+        Self::PROTOCOL
+    }
+
+    #[allow(unused)]
     fn packet_by_id<R: std::io::Read>(state: State, direction: Direction, id: i32, reader: &mut R) -> Option<std::io::Result<Self>>;
 }
 
@@ -73,17 +85,10 @@ macro_rules! define_protocol {
         }
 
         impl crate::protocol::Protocol for $struct_name {
-            #[allow(unused)]
-            fn name() -> &'static str {
-                $protocol_name
-            }
+            const NAME: &'static str = $protocol_name;
+            const PROTOCOL: i32 = $protocol_version;
 
-            #[allow(unused)]
-            fn protocol() -> i32 {
-                $protocol_version
-            }
-
-            #[allow(unused)]
+            #[allow(unreachable_patterns)]
             fn packet_by_id<R: std::io::Read>(state: State, direction: crate::protocol::Direction, id: i32, reader: &mut R) -> Option<std::io::Result<Self>> {
                 match state {
                     $($state => {

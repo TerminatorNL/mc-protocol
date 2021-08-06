@@ -8,7 +8,7 @@ edition = "2018"
 
 [features]
 default = []
-steven = ["steven_protocol", "serde_json"]
+steven = ["steven_protocol","steven_shared", "serde_json"]
 
 [dependencies]
 byteorder = "1.4.3"

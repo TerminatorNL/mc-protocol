@@ -333,7 +333,7 @@ define_protocol!(pub Proto_1_17_1, "1.17", 755, {
             },
             /// SetRecipeBookState replaces CraftingBookData, type 1.
             0x1f => SetRecipeBookState {
-                book_id: VarInt, // TODO: enum, 0: crafting, 1: furnace, 2: blast furnace, 3: smoker
+                book_id: VarInt, // TO DO: enum, 0: crafting, 1: furnace, 2: blast furnace, 3: smoker
                 book_open: bool,
                 filter_active: bool,
             },

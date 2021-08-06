@@ -1,5 +1,6 @@
 /// Implements Stevenarella to be used in this project.
 /// https://github.com/iceiix/stevenarella
+#[cfg(feature = "steven_shared")]
 pub mod version;
 
 mod private {
@@ -76,11 +77,14 @@ mod private {
     impl_serialize!(steven_protocol::protocol::packet::PlayerInfoData);
     impl_serialize!(steven_protocol::types::Metadata);
     impl_serialize!(steven_protocol::protocol::packet::EntityEquipments);
+
+    #[cfg(feature = "steven_shared")]
     impl_serialize!(steven_shared::Position);
-    impl_serialize!(std::string::String);
 
     #[cfg(feature = "serde_json")]
     impl_serialize!(serde_json::Value);
+
+    impl_serialize!(std::string::String);
 
     use steven_protocol::protocol::LenPrefixedBytes;
     impl_serialize!(LenPrefixedBytes, steven_protocol::protocol::Lengthable);
